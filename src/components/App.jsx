@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { nanoid } from 'nanoid';
+import { useSelector } from 'react-redux';
+import { getContacts } from 'redux/selectors';
 import { Container } from './Container/Container.styled';
 import { Section } from './Section/Section';
 import { ContactForm } from './ContactForm/ContactForm';
@@ -8,43 +8,17 @@ import { Filter } from './Filter/Filter';
 import { Notification } from './Notification/Notification';
 
 export const App = () => {
-  const [contacts, setContacts] = useState(() => {
-    try {
-      const contacts = localStorage.getItem('contacts');
-      return contacts ? JSON.parse(contacts) : [];
-    } catch (error) {
-      console.log(error);
-      return [];
-    }
-  });
-  const [filter, setFilter] = useState('');
-
-  const handleInputFilter = e => setFilter(e.target.value);
-
-  const handleSubmitContacts = ({ name, number }) =>
-    setContacts(prevState => [...prevState, { id: nanoid(), name, number }]);
-
-  const deleteContact = id =>
-    setContacts(prevState => prevState.filter(item => item.id !== id));
-
-  const normalizeFilter = filter.toLowerCase();
-  const visibleContactList = contacts.filter(contact =>
-    contact.name.toLowerCase().includes(normalizeFilter)
-  );
-
-  useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
+  const contacts = useSelector(getContacts);
 
   return (
     <Container>
       <Section title="phonebook">
-        <ContactForm onSubmit={handleSubmitContacts} contactList={contacts} />
+        <ContactForm />
       </Section>
       <Section title="contacts">
-        <Filter onChange={handleInputFilter} value={filter} />
+        <Filter />
         {contacts.length !== 0 ? (
-          <ContactList contact={visibleContactList} onDelete={deleteContact} />
+          <ContactList />
         ) : (
           <Notification message="no contacts" />
         )}
